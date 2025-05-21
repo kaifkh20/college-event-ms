@@ -15,8 +15,8 @@ const validatorRegistration = [body('email').isEmail(),body('password').isLength
 
 
 const validatorLogin = [body('email').isEmail(),body('password').isLength({min:7})]
-const validatorOrganizerRegistration = [...validatorLogin,body('admin_id').custom((value)=>{
-	const admin = User.findOne({_id:value})
+const validatorOrganizerRegistration = [...validatorLogin,body('admin_id').custom(async(value)=>{
+	const admin = await User.findOne({_id:value})
 	if(!admin){
 		throw new Error("No such user exists")
 	}
