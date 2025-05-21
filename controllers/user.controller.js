@@ -1,5 +1,8 @@
 import {validationResult} from "express-validator"
+
 import User from "../models/User.js"
+
+import { generateAccessToken, generateRefreshToken } from "../auth/auth.js"
 
 const registerUser = async(req,res)=>{	
 	const errors = validationResult(req)
@@ -18,6 +21,19 @@ const registerUser = async(req,res)=>{
 	}
 }
 
+const registerOrganizer = async(req,res)=>{
+	const errors = validationResult(req)
+	if(!errors.isEmpty()){
+		return res.status(400).json({errors:errors.array()})
+	}
+	try{
+		const user = await User.findOneAndUpdate({_id:user_id},{$set:{role:"organizer"}},{new : true})
+		res.status(200).send(user)
+	}catch(err){
+		res.status(400).json({error:err})
+	}
+}
+
 const loginUser = async(req,res)=>{
 	const errors = validationResult(req)
 	if(!errors.isEmpty()){
@@ -29,8 +45,25 @@ const loginUser = async(req,res)=>{
 
 	const isMatch = await user.comparePassword(password)
 	if(!isMatch) return res.status(400).json({error:'Invalid credentials'})
+	
+	const accessToken = generateAccessToken({id:user._id})
+	const refreshToken = generateRefreshToken({id:user._id})
+	
+	res.cookie("refreshToken",refreshToken,{
+		httpOnly : true,
+		secure : true,
+		sameSite : "Lax",
+		maxAge : 7*24*60*60*1000
+	})
 
-	res.status(200).send(user)
+	res.status(200).json({
+		accessToken	
+	})
+}
+
+const logoutUser = async(req,res)=>{
+	res.clearCookie("refreshToken")
+	res.sendStatus(204)
 }
 
 const getProfile = async(req,res)=>{
@@ -38,4 +71,4 @@ const getProfile = async(req,res)=>{
 	res.status(200).send("Profile Sent")
 }
 
-export default {registerUser,loginUser,getProfile}
+export default {registerUser,registerOrganizer,loginUser,logoutUser,getProfile}
