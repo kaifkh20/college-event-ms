@@ -1,7 +1,7 @@
 import express from "express"
 import multer from "multer"
 
-import {addEvents} from "../controllers/organizer.controller.js"
+import {addEvents,getEventById} from "../controllers/organizer.controller.js"
 import authenticateToken from "../auth/middleware.js"
 
 const router = express.Router()
@@ -15,6 +15,7 @@ const checkForOrganizer = (req,res,next)=>{
 }
 
 router.post("/addEvents",authenticateToken,checkForOrganizer,upload.single('eventImage'),addEvents)
+router.get("/event/:id",authenticateToken,checkForOrganizer,getEventById)
 
 export default router
 

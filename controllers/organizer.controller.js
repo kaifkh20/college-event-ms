@@ -16,4 +16,15 @@ const addEvents = async(req,res)=>{
 }
 
 
-export {addEvents}
+const getEventById = async(req,res,next)=>{
+	try{
+		const event_id = req.params.id
+		const event = await Event.findOne({_id:event_id})
+		res.status(200).send(event)
+	}catch(err){
+		console.error(err)
+		res.status(500).json({error:err})
+	}
+}
+
+export {addEvents,getEventById}
