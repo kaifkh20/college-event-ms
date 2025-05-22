@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser"
 
 import userRoutes from "./user.router.js"
 import studentRoutes from "./student.router.js"
+import organizerRoutes from "./organizer.router.js"
 
 const app = express()
 app.use(express.json())
@@ -12,6 +13,7 @@ app.use(express.json())
 app.use(cookieParser())
 app.use('/user',userRoutes)
 app.use('/student',studentRoutes)
+app.use('/organizer',organizerRoutes)
 
 const PORT = process.env.PORT
 

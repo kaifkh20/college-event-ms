@@ -25,6 +25,10 @@ const eventSchema = new mongoose.Schema({
 		type : [String],
 		default : ["Open For All"],
 		required : true
+	},
+	organizer_id:{
+		type : mongoose.Schema.Types.ObjectId,
+		ref : 'User'
 	}
 })
 
