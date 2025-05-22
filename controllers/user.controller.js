@@ -21,18 +21,6 @@ const registerUser = async(req,res)=>{
 	}
 }
 
-const registerOrganizer = async(req,res)=>{
-	const errors = validationResult(req)
-	if(!errors.isEmpty()){
-		return res.status(400).json({errors:errors.array()})
-	}
-	try{
-		const user = await User.findOneAndUpdate({_id:user_id},{$set:{role:"organizer"}},{new : true})
-		res.status(200).send(user)
-	}catch(err){
-		res.status(400).json({error:err})
-	}
-}
 
 const loginUser = async(req,res)=>{
 	const errors = validationResult(req)
@@ -62,8 +50,13 @@ const loginUser = async(req,res)=>{
 }
 
 const logoutUser = async(req,res)=>{
-	res.clearCookie("refreshToken")
-	res.sendStatus(204)
+	try{
+		res.clearCookie("refreshToken")
+		res.sendStatus(204)
+	}catch(err){
+		console.error(err)
+		res.status(500).json({error:"Logout Error"})
+	}
 }
 
 const getProfile = async(req,res)=>{
@@ -71,4 +64,4 @@ const getProfile = async(req,res)=>{
 	res.status(200).send("Profile Sent")
 }
 
-export default {registerUser,registerOrganizer,loginUser,logoutUser,getProfile}
+export default {registerUser,loginUser,logoutUser,getProfile}

@@ -6,7 +6,9 @@ import cookieParser from "cookie-parser"
 import userRoutes from "./user.router.js"
 import studentRoutes from "./student.router.js"
 import organizerRoutes from "./organizer.router.js"
+import adminRoutes from "./admin.router.js"
 
+import swaggerDocs from "../swagger.js"
 const app = express()
 app.use(express.json())
 
@@ -14,6 +16,7 @@ app.use(cookieParser())
 app.use('/user',userRoutes)
 app.use('/student',studentRoutes)
 app.use('/organizer',organizerRoutes)
+app.use('/admin',adminRoutes)
 
 const PORT = process.env.PORT
 
@@ -34,5 +37,7 @@ app.post('/refresh',(req,res)=>{
 app.listen(PORT,()=>{
 	console.log(`App listening at ${3000}`)
 })
+
+swaggerDocs(app,PORT)
 
 export default app
