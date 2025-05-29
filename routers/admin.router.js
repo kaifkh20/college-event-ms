@@ -1,7 +1,7 @@
 import express from "express"
 import multer from "multer"
 
-import {registerOrganizer} from "../controllers/admin.controller.js"
+import {registerOrganizer,registerAdmin,removeRegistration} from "../controllers/admin.controller.js"
 import {addEvent,editEvent} from "../controllers/shared.controller.js"
 import authenticateToken from "../auth/middleware.js"
 
@@ -45,6 +45,51 @@ const validateAdmin = (req,res,next)=>{
 
 
 router.put('/registerOrganizer',authenticateToken,validateAdmin,registerOrganizer)
+
+
+/** 
+* @swagger
+* /admin/registerAdmin:
+*    put:
+*      tags:
+*        - Admin Controller
+*      summary: Register a new admin user
+*      requestBody:
+*        required: true
+*        content:
+*          application/json:
+*            schema:
+*              type: object
+*              properties:
+*                user_id:
+*                  type: string
+*                  description: Unique identifier of the user
+*                  example: "12345"
+*      responses:
+*        200:
+*          description: Successfully registered admin
+*          content:
+*            application/json:
+*              schema:
+*                type: object
+*                properties:
+*                  user:
+*                    type: object
+*                    description: Admin user details
+*        400:
+*          description: Error while registering admin
+*          content:
+*            application/json:
+*              schema:
+*                type: object
+*                properties:
+*                  error:
+*                    type: string
+*                    description: Error message
+*                    example: "Invalid user_id"
+*/
+router.put('/registerAdmin',authenticateToken,validateAdmin,registerAdmin)
+
 /**
  * @swagger
  * /admin/addEvent:
@@ -251,6 +296,46 @@ router.post('/addEvent',authenticateToken,validateAdmin,upload.single('eventImag
  */
 
 router.patch('/editEvent/:event_id',authenticateToken,validateAdmin,editEvent)
+
+/**
+* @swagger 
+* /admin/removeRegistration:
+*    post:
+*      tags:
+*        - Admin Controller
+*      summary: Remove user registration from an event
+*      requestBody:
+*        required: true
+*        content:
+*          application/json:
+*            schema:
+*              type: object
+*              properties:
+*                user_id:
+*                  type: string
+*                  description: Unique identifier of the user
+*                  example: "12345"
+*                event_id:
+*                  type: string
+*                  description: Unique identifier of the event
+*                  example: "67890"
+*      responses:
+*        200:
+*          description: Successfully removed registration
+*          content:
+*            application/json:
+*              schema:
+*                type: string
+*                example: "Successful"
+*        400:
+*          description: Error while removing registration
+*          content:
+*            application/json:
+*              schema:
+*                type: string
+*                example: "Error"
+*/
+router.post('/removeRegistration',authenticateToken,validateAdmin,removeRegistration)
 
 export default router
 

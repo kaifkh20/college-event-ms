@@ -22,7 +22,23 @@ servers: [
     url: "<your live url here>--pending",
     description: "Live server"
   },
-]
+],
+    components: {
+      securitySchemes: {
+        // Cookie authentication scheme
+        cookieAuth: {
+          type: 'apiKey',
+          in: 'cookie',
+          name: 'refreshToken' // name of the cookie
+        },
+        // Bearer token authentication
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      }
+    } 
 },
 // looks for configuration in specified directories
 apis: ['./routers/*router.js'],
