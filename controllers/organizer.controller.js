@@ -1,6 +1,6 @@
 import Event from "../models/Event.js"
 
-const addEvents = async(req,res)=>{
+const addEvent= async(req,res)=>{
 
 	const eventImage = req.file.buffer
 	const {name,date,subEvents,fee,eligibility} = req.body
@@ -23,8 +23,8 @@ const getEventById = async(req,res,next)=>{
 		res.status(200).send(event)
 	}catch(err){
 		console.error(err)
-		res.status(500).json({error:err})
+		res.status(500).json({error:err.message})
 	}
 }
 
-export {addEvents,getEventById}
+export {addEvent,getEventById}

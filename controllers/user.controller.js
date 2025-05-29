@@ -1,7 +1,9 @@
 import {validationResult} from "express-validator"
+import jwt from "jsonwebtoken"
 
 import User from "../models/User.js"
-
+import Event from "../models/Event.js"
+import RegInEvent from "../models/RegisteredEvent.js"
 import { generateAccessToken, generateRefreshToken } from "../auth/auth.js"
 
 const registerUser = async(req,res)=>{	
@@ -49,6 +51,18 @@ const loginUser = async(req,res)=>{
 	})
 }
 
+const getRefresh = async(req,res)=>{
+	  const token = req.cookies.refreshToken;
+	  if (!token) return res.status(401).json({error:"No Token"});
+
+	  jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+	    if (err) return res.status(403).json({error:"Invalid Token"});
+
+	    const newAccessToken = generateAccessToken({ id: user.id });
+	    res.json({ accessToken: newAccessToken });
+	  });
+}
+
 const logoutUser = async(req,res)=>{
 	try{
 		res.clearCookie("refreshToken")
@@ -59,9 +73,36 @@ const logoutUser = async(req,res)=>{
 	}
 }
 
+const getEvents = async(req,res)=>{
+	try{
+		const events = await Event.find({})
+		res.status(200).send(events)
+	}catch(err){
+		console.error(err)
+		res.status(400).json({error:err})
+	}	
+}
+
+const getEventById = async(req,res,next)=>{
+	try{
+		const event_id = req.params.id
+		const event = await Event.findOne({_id:event_id}).lean()
+		if(!event){
+			return res.status(404).json({error:"Event not found"})
+		}
+		const ifRegistered = await RegInEvent.exists({event_id:event._id,student_id:req.user._id})
+		event.isRegistered = ifRegistered
+		res.status(200).send(event)
+	}catch(err){
+		console.error(err)
+		res.status(500).json({error:err})
+	}
+}
+
+
 const getProfile = async(req,res)=>{
 
 	res.status(200).send("Profile Sent")
 }
 
-export default {registerUser,loginUser,logoutUser,getProfile}
+export default {registerUser,loginUser,logoutUser,getProfile,getEvents,getEventById,getRefresh}

@@ -1,18 +1,6 @@
 import {validationResult} from "express-validator"
-import Event from "../models/Event.js"
 import RegInEvent from "../models/RegisteredEvent.js"
-
-
-const getEvent = async(req,res)=>{
-	try{
-		const events = await Event.find({})
-		res.status(200).send(events)
-	}catch(err){
-		console.error(err)
-		res.status(400).json({error:err})
-	}	
-}
-
+import QRCode from "qrcode"
 
 const registerEvent = async(req,res)=>{
 	try{
@@ -24,27 +12,32 @@ const registerEvent = async(req,res)=>{
 		if(!event_id && !user_id){
 			throw new Error("No sufficient info provided")
 		}
-
+		
 		const event = new RegInEvent({event_id,student_id:user_id})
 		await event.save()
+		
+		const qrContent = `_id:${event._id}`
+		const qrImage = await QRCode.toDataURL(qrContent)
 
-		console.log(`Registration for ${event_id} by ${user_id} and ${studentEmail} totaling for ${amount}`)
-		res.status(200).send("Registered in Event")
+
+		console.log(`Registration for ${event_id} by ${user_id} and ${studentEmail} totalling for ${amount}`)
+		res.status(200).send("Registration Succesfull")
 	}catch(err){
 		console.error(err)
 		res.status(401).json({error:err})
 	}
 }
 
-const getEventById = async(req,res,next)=>{
+const getRegisteredEvents = async(req,res)=>{
 	try{
-		const event_id = req.params.id
-		const event = await Event.findOne({_id:event_id})
-		res.status(200).send(event)
+		const id = req.user._id
+		const events = 	await RegInEvent.find({student_id:id})
+
+		res.status(200).send(events)
 	}catch(err){
 		console.error(err)
-		res.status(500).json({error:err})
+		res.status(401).json({error:err})
 	}
 }
 
-export {getEvent,registerEvent,getEventById}
+export {registerEvent,getRegisteredEvents}

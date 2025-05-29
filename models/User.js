@@ -29,17 +29,21 @@ const userSchema = new mongoose.Schema({
 	}
 })
 
-userSchema.methods.comparePassword = function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
+userSchema.methods.comparePassword = function(candidatePassword) {
+	if (!candidatePassword || !this.password) {
+        throw new Error('Password and hash are required');
+    }
+    return bcrypt.compare(candidatePassword, this.password);
 }
 
-userSchema.pre('save',async function(next){
-	if(!this.isModified('password')) return next()
-	this.password = await bcrypt.hash(this.password,7,(err,hash)=>{
-		if(err) throw new Error(err)
-		return hash
-	})
-	next()
+userSchema.pre('save', async function(next) {
+    if (!this.isModified('password')) return next();    
+    try {
+        this.password = await bcrypt.hash(this.password, 7);
+        next();
+    } catch (error) {
+        next(error);
+    }
 })
 
 const user = mongoose.model('User',userSchema)
