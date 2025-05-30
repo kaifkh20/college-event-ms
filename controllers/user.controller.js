@@ -86,7 +86,7 @@ const getEvents = async(req,res)=>{
 const getEventById = async(req,res,next)=>{
 	try{
 		const event_id = req.params.id
-		const event = await Event.findOne({_id:event_id}).lean()
+		let event = await Event.findOne({_id:event_id}).lean()
 		if(!event){
 			return res.status(404).json({error:"Event not found"})
 		}
