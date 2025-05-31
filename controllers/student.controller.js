@@ -8,18 +8,21 @@ const registerEvent = async(req,res)=>{
 		const amount = req.body.amount
 		const user_id = req.user._id
 		const studentEmail = req.user.email
-		
+		const subevents = req.body.subevents
+
 		if(!event_id && !user_id){
 			throw new Error("No sufficient info provided")
 		}
 		
-		const event = new RegInEvent({event_id,student_id:user_id})
+		const event = new RegInEvent({event_id,student_id:user_id,amountPaid:amount,subEvents:subevents})
 		await event.save()
 		
 		const qrContent = `_id:${event._id}`
-		const qrImage = await QRCode.toDataURL(qrContent)
+			
+		event.qrData = qrContent
 
-
+		await event.save()
+			
 		console.log(`Registration for ${event_id} by ${user_id} and ${studentEmail} totalling for ${amount}`)
 		res.status(200).send("Registration Succesfull")
 	}catch(err){

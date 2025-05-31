@@ -1,4 +1,5 @@
 import Event from "../models/Event.js"
+import RegInEvent from "../models/RegisteredEvent.js"
 
 const addEvent= async(req,res)=>{
 
@@ -40,7 +41,29 @@ const editEvent = async(req,res)=>{
 	
 }
 
+const scanRegistration = async(req,res)=>{
+	try{
+		const {qr} = req.body
+
+		const regId = qr.split(':')[1]
+
+		const record = await RegInEvent.findById(regId)
+		
+		if(!record) res.status(404).json({error:"No such record"})
+
+		if(record.scanned) res.status(400).json({error:"Already used"})
+
+		record.scanned = true
+
+		await record.save()
+
+		res.status(200).send("Scanned succesfully")
+	}catch(err){
+		console.error(err)
+		res.status(500).json({error:"Internal Server Error"})
+	}
+}
 
 
-export {addEvent,editEvent}
+export {addEvent,editEvent,scanRegistration}
 

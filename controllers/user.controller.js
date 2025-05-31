@@ -83,6 +83,18 @@ const getEvents = async(req,res)=>{
 	}	
 }
 
+const getRegisteredEvents = async(req,res)=>{
+	try{
+		const events = await RegInEvent.find({student_id:req.user._id}).populate('event_id')
+		if(events.length===0) return res.status(404).json({error:"No registered Events"})
+		
+		res.status(200).send(events)
+	}catch(err){
+		console.error(err)
+		res.status(500).json({error:"Internal server error"})
+	}
+}
+
 const getEventById = async(req,res,next)=>{
 	try{
 		const event_id = req.params.id
@@ -92,6 +104,7 @@ const getEventById = async(req,res,next)=>{
 		}
 		const ifRegistered = await RegInEvent.exists({event_id:event._id,student_id:req.user._id})
 		event.isRegistered = ifRegistered
+		
 		res.status(200).send(event)
 	}catch(err){
 		console.error(err)

@@ -11,39 +11,50 @@ const checkForRole = (req,res,next)=>{
 	}
 }
 /**
-* @swagger
-* /student/registerEvent:
-*  post:
-*    tags:
-*      - Student Controller
-*    summary: Register a student for an event
-*    requestBody:
-*      required: true
-*      content:
-*        application/json:
-*          schema:
-*            type: object
-*            properties:
-*              eventId:
-*                type: string
-*                description: ID of the event the student wants to register for
-*                example: "event123"
-*    responses:
-*      200:
-*        description: Registration successful
-*        content:
-*          application/json:
-*            schema:
-*              type: string
-*              example: "Success"
-*      401:
-*        description: Unauthorized or registration failed
-*        content:
-*          application/json:
-*            schema:
-*              type: string
-*              example: "Error"
-*/
+ * @swagger
+ * /student/registerEvent:
+ *   post:
+ *     tags:
+ *       - Student Controller
+ *     summary: Register a student for an event
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               eventId:
+ *                 type: string
+ *                 description: ID of the event the student wants to register for
+ *                 example: "event123"
+ *               amount:
+ *                 type: integer
+ *                 description: The amount paid for registration
+ *                 example: 100
+ *               subevents:
+ *                 type: array
+ *                 description: List of sub-event IDs the student is registering for
+ *                 items:
+ *                   type: string
+ *                 example: ["subeventA", "subeventB"]
+ *     responses:
+ *       200:
+ *         description: Registration successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: "Success"
+ *       401:
+ *         description: Unauthorized or registration failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: "Error"
+ */
+
 router.post('/registerEvent',authenticateToken,checkForRole,registerEvent)
 
 

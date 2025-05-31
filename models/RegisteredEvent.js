@@ -9,6 +9,16 @@ const registeredSchema = new mongoose.Schema({
 		type : mongoose.Schema.Types.ObjectId,
 		ref : 'User'
 	},
+	subEvents : {
+		type : Array
+	},
+	amountPaid :{
+		type : Number,
+		default : 0
+	},
+	qrData:{
+		type : String,
+	},
 	scanned : {
 		type : Boolean,
 		deafult : false

@@ -2,7 +2,7 @@ import express from "express"
 import multer from "multer"
 
 import {registerOrganizer,registerAdmin,removeRegistration} from "../controllers/admin.controller.js"
-import {addEvent,editEvent} from "../controllers/shared.controller.js"
+import {addEvent,editEvent,scanRegistration} from "../controllers/shared.controller.js"
 import authenticateToken from "../auth/middleware.js"
 
 const router = express.Router()
@@ -337,5 +337,48 @@ router.patch('/editEvent/:event_id',authenticateToken,validateAdmin,editEvent)
 */
 router.post('/removeRegistration',authenticateToken,validateAdmin,removeRegistration)
 
+
+/** 
+* @swagger
+* /admin/scan:
+*    post:
+*      tags:
+*        - Admin Controller
+*      summary: Scan a QR code
+*      requestBody:
+*        required: true
+*        content:
+*          application/json:
+*            schema:
+*              type: object
+*              properties:
+*                qr:
+*                  type: string
+*                  description: QR code data
+*                  example: "ABCD1234XYZ"
+*      responses:
+*        200:
+*          description: Scanned successfully
+*          content:
+*            application/json:
+*              schema:
+*                type: string
+*                example: "Scanned successfully"
+*        400:
+*          description: QR code already scanned
+*          content:
+*            application/json:
+*              schema:
+*                type: string
+*                example: "Already scanned"
+*        404:
+*          description: Invalid QR code
+*          content:
+*            application/json:
+*              schema:
+*                type: string
+*                example: "Invalid"
+*/
+router.post('/scan',authenticateToken,validateAdmin,scanRegistration)
 export default router
 
