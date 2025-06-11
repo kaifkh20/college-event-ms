@@ -1,8 +1,8 @@
 import express from "express"
 import multer from "multer"
 
-import {registerOrganizer,registerAdmin,removeRegistration} from "../controllers/admin.controller.js"
-import {addEvent,editEvent,scanRegistration} from "../controllers/shared.controller.js"
+import {registerOrganizer,registerAdmin,removeRegistration,getAllUsers} from "../controllers/admin.controller.js"
+import {addEvent,editEvent,scanRegistration,deleteEvent} from "../controllers/shared.controller.js"
 import authenticateToken from "../auth/middleware.js"
 
 const router = express.Router()
@@ -11,7 +11,7 @@ const storage = multer.memoryStorage()
 const upload = multer({storage})
 
 const validateAdmin = (req,res,next)=>{
-	if(req.user.role==="admin") next()
+	if(req.user.role==="admin") return next()
 	else return res.status(400).json({error:"Unauth access"})
 }
 
@@ -295,7 +295,7 @@ router.post('/addEvent',authenticateToken,validateAdmin,upload.single('eventImag
  *                   example: "Error updating event"
  */
 
-router.patch('/editEvent/:event_id',authenticateToken,validateAdmin,editEvent)
+router.patch('/editEvent/:event_id',authenticateToken,validateAdmin,upload.single('eventImage'),editEvent)
 
 /**
 * @swagger 
@@ -380,5 +380,9 @@ router.post('/removeRegistration',authenticateToken,validateAdmin,removeRegistra
 *                example: "Invalid"
 */
 router.post('/scan',authenticateToken,validateAdmin,scanRegistration)
+
+router.get('/getAllUsers',authenticateToken,validateAdmin,getAllUsers)
+
+router.delete('/deleteEvent/:id',authenticateToken,validateAdmin,deleteEvent)
 export default router
 

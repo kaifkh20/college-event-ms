@@ -297,6 +297,50 @@ router.get('/events',authenticateToken,userController.getEvents)
 
 router.get('/event/:id',authenticateToken,userController.getEventById)
 
+/**
+* @swagger
+* /user/updateProfile:
+*   patch:
+*     tags:
+*       - User Controller
+*     summary: Update user profile details
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             type: object
+*             properties:
+*               name:
+*                 type: string
+*                 description: Updated name of the user
+*                 example: "John Doe"
+*               email:
+*                 type: string
+*                 format: email
+*                 description: Updated email address of the user
+*                 example: "johndoe@example.com"
+*               only:
+*                 type: boolean
+*                 description: Flag indicating if only specific attributes should be updated
+*                 example: true
+*     responses:
+*       200:
+*         description: Profile updated successfully
+*         content:
+*           application/json:
+*             schema:
+*               type: string
+*               example: "Profile updated"
+*       500:
+*         description: Internal server error
+*         content:
+*           application/json:
+*             schema:
+*               type: string
+*               example: "Internal server error"
+*/
+router.patch('/updateProfile',authenticateToken,userController.updateProfile)
 
 /* no need here */
 router.get('/profile',userController.getProfile);

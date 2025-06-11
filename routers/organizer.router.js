@@ -2,7 +2,7 @@ import express from "express"
 import multer from "multer"
 
 import authenticateToken from "../auth/middleware.js"
-import {addEvent,editEvent,scanRegistration} from "../controllers/shared.controller.js"
+import {addEvent,editEvent,scanRegistration,deleteEvent} from "../controllers/shared.controller.js"
 
 const router = express.Router()
 
@@ -257,6 +257,8 @@ router.patch('/editEvent/:event_id',authenticateToken,checkForOrganizer,upload.s
 *                example: "Invalid"
 */
 router.post('/scan',authenticateToken,checkForOrganizer,scanRegistration)
+
+router.delete('/deleteEvent/:id',authenticateToken,checkForOrganizer,deleteEvent)
 
 export default router
 

@@ -19,7 +19,7 @@ const registerUser = async(req,res)=>{
 		return res.status(200).send(user)
 	}catch(err){
 		console.error(err)
-		return res.status(400).json({error:err})
+		return res.status(400).json({error:"Already exists!"})
 	}
 }
 
@@ -47,7 +47,8 @@ const loginUser = async(req,res)=>{
 	})
 
 	res.status(200).json({
-		accessToken	
+		accessToken,
+		user
 	})
 }
 
@@ -66,7 +67,7 @@ const getRefresh = async(req,res)=>{
 const logoutUser = async(req,res)=>{
 	try{
 		res.clearCookie("refreshToken")
-		res.sendStatus(204)
+		res.status(200).send("Logout Successfull!")
 	}catch(err){
 		console.error(err)
 		res.status(500).json({error:"Logout Error"})
@@ -75,8 +76,25 @@ const logoutUser = async(req,res)=>{
 
 const getEvents = async(req,res)=>{
 	try{
-		const events = await Event.find({})
-		res.status(200).send(events)
+	const events = await Event.find({}).lean();
+
+	if (req.user.role === "admin" || req.user.role === "organizer") {
+	  const populatedEvents = await Promise.all(
+	    events.map(async (event) => {
+	      const participants = await RegInEvent.find({ event_id: event._id })
+		.populate("student_id", "_id name email")
+		.lean();
+
+	      return {
+		...event,
+		participants: participants.map((p) => p.student_id),
+	      };
+	    })
+	  );
+
+	  return res.status(200).send(populatedEvents);
+	}
+	return res.status(200).send(events)
 	}catch(err){
 		console.error(err)
 		res.status(400).json({error:err})
@@ -95,27 +113,63 @@ const getRegisteredEvents = async(req,res)=>{
 	}
 }
 
-const getEventById = async(req,res,next)=>{
-	try{
-		const event_id = req.params.id
-		let event = await Event.findOne({_id:event_id}).lean()
-		if(!event){
-			return res.status(404).json({error:"Event not found"})
-		}
-		const ifRegistered = await RegInEvent.exists({event_id:event._id,student_id:req.user._id})
-		event.isRegistered = ifRegistered
-		
-		res.status(200).send(event)
-	}catch(err){
-		console.error(err)
-		res.status(500).json({error:err})
-	}
-}
+const getEventById = async (req, res, next) => {
+  try {
+    const event_id = req.params.id;
+    let event = await Event.findOne({ _id: event_id }).lean();
+
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    const ifRegistered = await RegInEvent.exists({
+      event_id: event._id,
+      student_id: req.user._id,
+    });
+
+    event.isRegistered = ifRegistered;
+
+    if (req.user.role === "admin" || req.user.role === "organizer") {
+      const participants = await RegInEvent.find({ event_id: event._id })
+        .populate("student_id", "name email") // adjust fields as needed
+        .lean();
+
+      event.participants = participants;
+    }
+
+    res.status(200).send(event);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err });
+  }
+};
 
 
 const getProfile = async(req,res)=>{
-
 	res.status(200).send("Profile Sent")
 }
 
-export default {registerUser,loginUser,logoutUser,getProfile,getEvents,getEventById,getRefresh}
+const updateProfile = async(req,res)=>{
+	try{
+		const user_id = req.user._id
+		const update = req.body
+		
+		const user = await User.findById(user_id)
+		
+		if(!user) return res.status(404).json({error:"User not found"})
+
+		Object.keys(updates).forEach((key)=>{
+			if(updates[key]!==undefined) user[key] = updates[key] 
+		})
+
+		await user.save()
+		
+		res.status(200).send("User updated")
+
+	}catch(err){
+		console.error(err)
+		res.status(500).json({error:"Internal server error"})
+	}
+}
+
+export default {registerUser,loginUser,logoutUser,getProfile,getEvents,getEventById,getRefresh,updateProfile}

@@ -24,13 +24,20 @@ const editEvent = async(req,res)=>{
 	}
 	try{
 		
-		const event = await Event.findById(eventId)
+		const event = await Event.findById(event_id)
 
 		if(!event)	return res.status(404).json({error:"No such Event found"})
+		if (updates && typeof updates === 'object') {
+		  Object.keys(updates).forEach((key) => {
+		    if (updates[key] !== undefined && updates[key] !== null) {
+		      event[key] = updates[key];
+		    }
+		  });
+		} else {
+		 throw Error("udpates is not an object")
+		  console.error("updates is not an object or is null/undefined");
+		}
 		
-		Object.keys(updates).forEach((key)=>{
-			if(updates[key]!==undefined) event[key] = updates[key] 
-		})
 		await event.save()
 
 		return res.status(200).send("Event updated")
@@ -64,6 +71,20 @@ const scanRegistration = async(req,res)=>{
 	}
 }
 
+const deleteEvent = async(req,res)=>{
+	try{
+		const id = req.params.id
+		const deletedEvent = await Event.findByIdAndDelete(id)
 
-export {addEvent,editEvent,scanRegistration}
+		if(deletedEvent) return res.status(200).send("Event deleted")
+		
+		res.status(400).json({error:"Invalid event"})
+	}catch(err){
+		console.log(err)
+		return res.status(500).json({error:"Internal server"})
+	}
+
+}
+
+export {addEvent,editEvent,scanRegistration,deleteEvent}
 

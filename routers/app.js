@@ -2,6 +2,7 @@ import express from "express"
 import dbConnect from "../db/db.js"
 import "dotenv/config"
 import cookieParser from "cookie-parser"
+import cors from "cors"
 
 import userRoutes from "./user.router.js"
 import studentRoutes from "./student.router.js"
@@ -12,6 +13,10 @@ import swaggerDocs from "../swagger.js"
 const app = express()
 app.use(express.json())
 
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true, // if you're using cookies or authorization headers
+}));
 app.use(cookieParser())
 app.use('/user',userRoutes)
 app.use('/student',studentRoutes)
