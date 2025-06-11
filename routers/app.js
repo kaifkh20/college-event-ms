@@ -4,20 +4,34 @@ import "dotenv/config"
 import cookieParser from "cookie-parser"
 import cors from "cors"
 
+import path from "path";
+import fs from "fs";
+import multer from "multer"
 import userRoutes from "./user.router.js"
 import studentRoutes from "./student.router.js"
 import organizerRoutes from "./organizer.router.js"
 import adminRoutes from "./admin.router.js"
 
+import authenticateToken from "../auth/middleware.js"
+
 import swaggerDocs from "../swagger.js"
 const app = express()
-app.use(express.json())
+
+app.use((req, res, next) => {
+  if (req.is('application/json')) {
+    express.json()(req, res, next);
+  } else {
+    next();
+  }
+});
 
 app.use(cors({
   origin: 'http://localhost:5173',
   credentials: true, // if you're using cookies or authorization headers
 }));
 app.use(cookieParser())
+app.use(express.urlencoded({ extended: true, limit: '7mb' }));
+app.use("/uploads", express.static("uploads"));
 app.use('/user',userRoutes)
 app.use('/student',studentRoutes)
 app.use('/organizer',organizerRoutes)
@@ -86,6 +100,33 @@ app.post('/refresh',(req,res)=>{
 	    res.json({ accessToken: newAccessToken });
 	  });
 })
+
+const UPLOAD_DIR = "uploads";
+if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, UPLOAD_DIR); // Store in 'uploads/' folder
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB
+  },
+});
+
+app.post("/upload/image", authenticateToken, upload.single("image"), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+
+  const imageUrl = `/uploads/${req.file.filename}`;
+  res.status(200).json({ imageUrl });
+});
 
 app.listen(PORT,()=>{
 	console.log(`App listening at ${3000}`)

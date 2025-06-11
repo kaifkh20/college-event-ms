@@ -5,10 +5,9 @@ import {registerOrganizer,registerAdmin,removeRegistration,getAllUsers} from "..
 import {addEvent,editEvent,scanRegistration,deleteEvent} from "../controllers/shared.controller.js"
 import authenticateToken from "../auth/middleware.js"
 
+
 const router = express.Router()
 
-const storage = multer.memoryStorage()
-const upload = multer({storage})
 
 const validateAdmin = (req,res,next)=>{
 	if(req.user.role==="admin") return next()
@@ -158,7 +157,7 @@ router.put('/registerAdmin',authenticateToken,validateAdmin,registerAdmin)
  */
 
 
-router.post('/addEvent',authenticateToken,validateAdmin,upload.single('eventImage'),addEvent)
+router.post('/addEvent',authenticateToken,validateAdmin,addEvent)
 
 /**
  * @swagger
@@ -295,7 +294,7 @@ router.post('/addEvent',authenticateToken,validateAdmin,upload.single('eventImag
  *                   example: "Error updating event"
  */
 
-router.patch('/editEvent/:event_id',authenticateToken,validateAdmin,upload.single('eventImage'),editEvent)
+router.patch('/editEvent/:event_id',authenticateToken,validateAdmin,editEvent)
 
 /**
 * @swagger 

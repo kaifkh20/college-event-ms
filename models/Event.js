@@ -2,8 +2,10 @@ import mongoose from "mongoose"
 import RegInEvent from "../models/RegisteredEvent.js"
 
 const eventSchema = new mongoose.Schema({
-	eventImage : {
-		type : Buffer
+	imageUrl : {
+		type : String,
+		required:false,
+		default : ""
 	},
 	name : {
 		type : String,

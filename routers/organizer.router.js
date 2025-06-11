@@ -6,9 +6,6 @@ import {addEvent,editEvent,scanRegistration,deleteEvent} from "../controllers/sh
 
 const router = express.Router()
 
-const storage = multer.memoryStorage()
-const upload = multer({storage})
-
 const checkForOrganizer = (req,res,next)=>{
 	if(req.user.role==="organizer") next()
 	else return res.status(400).json({error:"Not an organizer or Admin"}) 
@@ -79,7 +76,7 @@ const checkForOrganizer = (req,res,next)=>{
  *               type: string
  *               example: "Error"
  */
-router.post("/addEvent",authenticateToken,checkForOrganizer,upload.single('eventImage'),addEvent)
+router.post("/addEvent",authenticateToken,checkForOrganizer,addEvent)
 /**
  * @swagger
  * /organizer/editEvent/{event_id}:
@@ -214,7 +211,7 @@ router.post("/addEvent",authenticateToken,checkForOrganizer,upload.single('event
  *                   type: string
  *                   example: "Error updating event"
  */
-router.patch('/editEvent/:event_id',authenticateToken,checkForOrganizer,upload.single('eventImage'),editEvent)
+router.patch('/editEvent/:event_id',authenticateToken,checkForOrganizer,editEvent)
 /**
 * @swagger
 * /organizer/scan:
