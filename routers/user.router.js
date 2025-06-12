@@ -6,12 +6,7 @@ import authenticateToken from "../auth/middleware.js"
 
 const router = express.Router()
 
-const validatorRegistration = [body('email').isEmail(),body('password').isLength({min:7}),body('role').custom((value)=>{
-	if (!['student'].includes(value)){
-		throw new Error(`Role ${value} is not valid`)
-	}
-	return true
-})]
+const validatorRegistration = [body('email').isEmail(),body('password').isLength({min:7})]
 
 
 const validatorLogin = [body('email').isEmail(),body('password').isLength({min:7})]

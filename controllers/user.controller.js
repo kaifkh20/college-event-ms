@@ -9,10 +9,11 @@ import { generateAccessToken, generateRefreshToken } from "../auth/auth.js"
 const registerUser = async(req,res)=>{	
 	const errors = validationResult(req)
 	if(!errors.isEmpty()){
+		console.error(errors.array())
 		return res.status(400).json({errors:errors.array()})
 	}
 	
-	const {name,email,password,role} = req.body
+	const {name,email,password} = req.body 
 	try{
 		const user = new User(req.body)
 		await user.save()

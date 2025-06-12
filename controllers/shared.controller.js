@@ -3,10 +3,10 @@ import RegInEvent from "../models/RegisteredEvent.js"
 
 const addEvent= async(req,res)=>{
 
-	const {imageUrl,name,date,subEvents,fee,eligibility} = req.body
+	const {imageUrl,name,date,subEvents,fee,eligibility,venue,description} = req.body
 	const organizer_id = req.user._id
 	try{
-		const event = new Event({imageUrl,name,date,subEvents,fee,eligibility,organizer_id})
+		const event = new Event({imageUrl,name,description,date,subEvents,fee,eligibility,organizer_id,venue})
 		await event.save()
 		res.status(200).send("Event Created")
 	}catch(err){
@@ -52,9 +52,9 @@ const scanRegistration = async(req,res)=>{
 
 		const record = await RegInEvent.findById(regId)
 		
-		if(!record) res.status(404).json({error:"No such record"})
+		if(!record) return res.status(404).json({error:"No such record"})
 
-		if(record.scanned) res.status(400).json({error:"Already used"})
+		if(record.scanned) return res.status(400).json({error:"Already used"})
 
 		record.scanned = true
 

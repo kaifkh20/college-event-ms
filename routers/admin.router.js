@@ -43,7 +43,7 @@ const validateAdmin = (req,res,next)=>{
 */
 
 
-router.put('/registerOrganizer',authenticateToken,validateAdmin,registerOrganizer)
+router.post('/registerOrganizer',authenticateToken,validateAdmin,registerOrganizer)
 
 
 /** 
@@ -87,7 +87,7 @@ router.put('/registerOrganizer',authenticateToken,validateAdmin,registerOrganize
 *                    description: Error message
 *                    example: "Invalid user_id"
 */
-router.put('/registerAdmin',authenticateToken,validateAdmin,registerAdmin)
+router.post('/registerAdmin',authenticateToken,validateAdmin,registerAdmin)
 
 /**
  * @swagger

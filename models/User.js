@@ -25,7 +25,8 @@ const userSchema = new mongoose.Schema({
 		enum : {
 			values : ['student','organizer','admin'],
 			messages : "Invlaid role type."
-		}
+		},
+		default : "student"
 	}
 })
 

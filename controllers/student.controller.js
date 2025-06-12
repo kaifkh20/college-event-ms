@@ -31,7 +31,7 @@ const registerEvent = async(req,res)=>{
 		
 		sendConfirmationMail(studentEmail,event)
 
-		res.status(200).send("Registration Succesfull")
+		res.status(200).send(event)
 	}catch(err){
 		console.error(err)
 		res.status(401).json({error:err})
